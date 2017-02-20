@@ -2,30 +2,33 @@
 //FYP: Automatic Parking Space Allocation and
 // Indoor Parking Lot Navigation System with Beacon
 
-var i = 0;
-var bufferPt = 0;
+var count = 0;
 
-function fingerPrint(ID1,RSSI1,ID2,RSSI2,ID3,RSSI3){
-	var temp1 = rssiProcess(ID1,RSSI1);
-	var temp2 = rssiProcess(ID2,RSSI2);
-	var temp3 = rssiProcess(ID3,RSSI3);
+function fingerPrint(test_data_row){
+	var output = Point("buffer",0,0);
 
-	if(i%output_point==0){
-		if(filterList.length>=3){
-			var userPt = mapMatch(
-					filterList[0].BeaconID,
-					filterList[0].RSSI,
-					filterList[1].BeaconID,
-					filterList[1].RSSI,
-					filterList[2].BeaconID,
-					filterList[2].RSSI
-				);
-			bufferPt = userPt;
+	//Put each datapoint into Kalman Filter
+	var active_id = []
+	for(var i=0; i<test_data_row.beacons.length; i++){
+		active_id.push(test_data_row.beacons[i].bid);
+		rssiProcess(test_data_row.beacons[i].bid, test_data_row.beacons[i].rssi, test_data_row.beacons.length-i);
+	}
+	updateLife(active_id);
+
+	//Take the useful entities in the filterList to map reference point
+
+
+	//Output user location from the filterList
+	if((count+1)%output_point==0){ //ouput valid value for every <output_point>
+		if(filterList.length>=1){
+			var userPt = mapMatch(filterList);
+			output = userPt;
 		}
 	}
 
-	i++;
-	if(i==output_point) i=0;
 
-	return bufferPt;  //attribute: name, x, y
+	count++;
+	if((count)==output_point) count=0;
+
+	return output;  //attribute: name, x, y
 }

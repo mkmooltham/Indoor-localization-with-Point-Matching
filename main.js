@@ -2,6 +2,17 @@
 //FYP: Automatic Parking Space Allocation and
 // Indoor Parking Lot Navigation System with Beacon
 
+//temp delete after array input work//
+var test_data = []; //{beacons:{bid, rssi}}
+
+for(var i=0; i<ppts.length; i++){
+	var temp = [];
+	for(key in ppts[i]){
+		temp.push({bid:key, rssi:ppts[i][key]});
+	}
+	test_data.push({beacons:temp});
+}
+
 window.onload = main();
 
 function main(){
@@ -10,19 +21,26 @@ function main(){
 	var count = 0;
 
 	var timer = setInterval( function(){
+		//Input test data
 		if(count<ppts.length){
-		//Start Code
-			printv(count+" "+fingerPrint(ppts[i].ID1,ppts[i].RSSI1,ppts[i].ID2,ppts[i].RSSI2,ppts[i].ID3,ppts[i].RSSI3).getInfo());
-		//End Code
+		///////////Start Code////////////
+			//input data into algorithm
+			var userPoint = fingerPrint(test_data[count]); //change back to test_data when array works
+			//output point for each <output_rate>
+			if(userPoint != Point()){
+				printv((count+1)+" "+userPoint.getInfo());
+				printnl();
+			}
+		///////////End Code//////////////
 			count++;
 		} else{
-			i=0;
 			printv("End of sample");
 			clearInterval(timer);
 		}
 		}, beacon_response_time);
 
 	printv("Done~");
+	printnl();
 }
 
 //HTML Output
@@ -30,8 +48,12 @@ function printc(){
 	document.getElementById("output").innerHTML = "";
 }
 
+function printnl(){
+	document.getElementById("output").innerHTML += "<br/>";
+}
+
 function printv(a){
-	document.getElementById("output").innerHTML += a+"<br/>";
+	document.getElementById("output").innerHTML += a;
 }
 
 function printa(arr){
@@ -50,6 +72,7 @@ function printFilter(){
     +" ,life: "+filterList[i].life
     +" )"
   );
+    printnl();
   }
 }
 
@@ -123,9 +146,9 @@ function drawMap(activeBeacon,calPoint,calPoint1){
 	drawPoint(new Point(5,311,267),beacon_color,size=10,'filled');
 	drawPoint(new Point(6,311,133),beacon_color,size=10,'filled');
 	//Working Beacon
-	drawPoint(new Point(activeBeacon[0],idKey[activeBeacon[0]].x,idKey[activeBeacon[0]].y),active_beacon_color,size=9);
-	drawPoint(new Point(activeBeacon[1],idKey[activeBeacon[1]].x,idKey[activeBeacon[1]].y),active_beacon_color,size=9);
-	drawPoint(new Point(activeBeacon[2],idKey[activeBeacon[2]].x,idKey[activeBeacon[2]].y),active_beacon_color,size=9);
+	drawPoint(new Point(activeBeacon[0],beaconDeployment[activeBeacon[0]].x,beaconDeployment[activeBeacon[0]].y),active_beacon_color,size=9);
+	drawPoint(new Point(activeBeacon[1],beaconDeployment[activeBeacon[1]].x,beaconDeployment[activeBeacon[1]].y),active_beacon_color,size=9);
+	drawPoint(new Point(activeBeacon[2],beaconDeployment[activeBeacon[2]].x,beaconDeployment[activeBeacon[2]].y),active_beacon_color,size=9);
 	//calcalted location
 	drawPoint(calPoint,cal_location_color,size=10,"filled");
 	//Real Location

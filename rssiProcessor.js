@@ -75,14 +75,12 @@ function updateFilter(id){
   for (var i=0; i<filterList.length; i++){
 
     if(filterList[i].BeaconID==id){
-      filterList[i].life+=2;
       filterList[i].counter+=1;
       if(filterList[i].counter==frame_size){
         filterList[i].counter=0;
         filterList[i].filter= new KalmanFilter({R: 0.01, Q: 20});
         } 
       } else{
-        filterList[i].life-=1;
         if(filterList[i].life<0){
            filterList.splice(i,1);
         }
@@ -99,7 +97,7 @@ function sortFilterList() {
 
         for(var j = i-1; j >= 0; --j)
         {
-            if(filterList[j].life >= currentItem.life) break;
+            if(filterList[j].BeaconID >= currentItem.BeaconID) break;
             filterList[j+1] = filterList[j];
         }
 
@@ -108,16 +106,30 @@ function sortFilterList() {
 
 };
 
+function updateLife(active_id){
+  for(var i=0; i<filterList.length; i++){
+    var exist = false;
+    for(var j=0; j<active_id.length; j++){
+      if(active_id[j]==filterList[i].BeaconID){
+        filterList[i].life+=1;
+        exist = true;
+        break;
+      }
+    }
+    if(!exist){filterList[i].life-=1;}
+  }
+}
+
 
 //Tertiary functions
 function rssiToDis(id,rssi){
-  var a=(idKey[id].a0-rssi)/(10*envr_constant);
+  var a=(beaconDeployment[id].a0-rssi)/(10*envr_constant);
 
-  return Math.pow(10,a)*idKey[id].d0;
+  return Math.pow(10,a)*beaconDeployment[id].d0;
 }
 
 function disToRSSI(id,dis){
-  return -10*envr_constant*Math.log10(dis/idKey[id].d0)+idKey[id].a0;
+  return -10*envr_constant*Math.log10(dis/beaconDeployment[id].d0)+beaconDeployment[id].a0;
 }
 
 
